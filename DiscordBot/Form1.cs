@@ -6,12 +6,14 @@ namespace DiscordBot
 {
     public partial class Form1 : Form
     {
-        delegate void SetTextCallback(string text);
 
-        private static DiscordClient _bot;
+        private static DiscordClient _bot; // bot
+
+        /**DETAILS FOR LOGIN**/
         private static string email;
         private static string password;
-        private static string message;
+
+        private static string message; // store received message here
 
         public Form1()
         {
@@ -20,9 +22,11 @@ namespace DiscordBot
 
         private void Running()
         {
-            _bot.Connect(email, password).Wait();
+            _bot.Connect(email, password).Wait(); // connect to server
             enterCred.Text = "Connected!";
             message = "";
+
+            /*Keep checking for user messages and perform actions*/
             _bot.MessageCreated += async (s, e) =>
             {
                 if (!e.Message.IsAuthor)
@@ -77,7 +81,7 @@ namespace DiscordBot
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(usernameBox.TextLength != 0 && passwordBox.TextLength != 0)
+            if(usernameBox.TextLength != 0 && passwordBox.TextLength != 0) // click button to login
             {
                 email = usernameBox.Text;
                 password = passwordBox.Text;
