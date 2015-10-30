@@ -18,6 +18,7 @@ namespace DiscordBot
 
         private static string admin = "dreameater"; // admin name here
         private static string message; // store received message here
+        private static string botChannel = "109469668976140288"; // channel to send most bot messages to
 
         Random rand = new Random();
         Boolean RPS = false;
@@ -124,57 +125,78 @@ namespace DiscordBot
                             int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
                             if (num == 0)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! We tie!");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! We tie!");
                             }
                             else if (num == 1)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! I win! (-1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! I win! (-1 score)");
                                 loss = true;
                             }
                             else
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! You win! (+1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! You win! (+1 score)");
                                 win = true;
                             }
-                            await _bot.DeleteMessage(e.Message);
+                            try
+                            {
+                                await _bot.DeleteMessage(e.Message);
+                            }
+                            catch
+                            {
+                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
+                            }
                         } else if (message == "paper")
                         {
                             RPS = true;
                             int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
                             if (num == 0)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! You win! (+1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! You win! (+1 score)");
                                 win = true;
                             }
                             else if (num == 1)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! We tie!");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! We tie!");
                             }
                             else
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! I win! (-1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! I win! (-1 score)");
                                 loss = true;
                             }
-                            await _bot.DeleteMessage(e.Message);
+                            try
+                            {
+                                await _bot.DeleteMessage(e.Message);
+                            }
+                            catch
+                            {
+                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
+                            }
                         } else if (message == "scissors")
                         {
                             RPS = true;
                             int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
                             if (num == 0)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! I win! (-1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! I win! (-1 score)");
                                 loss = true;
                             }
                             else if (num == 1)
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! You win! (+1 score)");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! You win! (+1 score)");
                                 win = true;
                             }
                             else
                             {
-                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! We tie!");
+                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! We tie!");
                             }
-                            await _bot.DeleteMessage(e.Message);
+                            try
+                            {
+                                await _bot.DeleteMessage(e.Message);
+                            }
+                            catch
+                            {
+                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
+                            }
                         } else if (message == "fkalec")
                         {
                             await _bot.SendMessage(e.ChannelId, "fk alec");
@@ -208,7 +230,15 @@ namespace DiscordBot
                             {
                                 txtScores += (pair.Key + ": " + pair.Value + "\n");
                             }
-                            await _bot.SendMessage("109469668976140288", txtScores);
+                            try
+                            {
+                                await _bot.DeleteMessage(e.Message);
+                            }
+                            catch
+                            {
+                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
+                            }
+                            await _bot.SendMessage(botChannel, txtScores);
                         } else if (message == "links")
                         {
                             string concat = "";
@@ -265,6 +295,24 @@ namespace DiscordBot
                 password = passwordBox.Text;
                 Running();
             }
+        }
+
+        private void github_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                VisitLink();
+            }
+            catch (Exception ex)
+            {
+                // link didn't work
+            }
+        }
+
+        private void VisitLink()
+        {
+            github.LinkVisited = true;
+            System.Diagnostics.Process.Start("https://github.com/buttsj");
         }
     }
 }
