@@ -1,0 +1,88 @@
+﻿using System;
+using System.Windows.Forms;
+using Discord;
+
+namespace DiscordBot
+{
+    public partial class Form1 : Form
+    {
+        delegate void SetTextCallback(string text);
+
+        private static DiscordClient _bot;
+        private static string email;
+        private static string password;
+        private static string message;
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Running()
+        {
+            _bot.Connect(email, password).Wait();
+            enterCred.Text = "Connected!";
+            message = "";
+            _bot.MessageCreated += async (s, e) =>
+            {
+                if (!e.Message.IsAuthor)
+                {
+                    if (e.Message.Text.StartsWith("!"))
+                    {
+                        message = e.Message.Text.Remove(0, 1).ToLower();
+                        if (listBox1.InvokeRequired)
+                        {
+                            listBox1.Invoke(new MethodInvoker(delegate {
+                                listBox1.Items.Add(DateTime.Now.ToLongTimeString() + ":" + " command " + "'!" + message + "'" + " from " + e.Message.UserId);
+                            }));
+                        }
+
+                        if (message == "help")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !meme !dnd !rock/paper/scissors !spam");
+                        } else if (message == "spam")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
+                        } else if (message == "fkalec")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "fk alec");
+                        } else if (message == "jackbot")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "Hello my good friend. Hope you have a jooday.");
+                        } else if (message == "dnd")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "D&D is scheduled for Sunday November 1st, sometime around 1pm.");
+                        }
+                    }
+                } else
+                {
+                    if (e.Message.Text.StartsWith("!"))
+                    {
+                        message = e.Message.Text.Remove(0, 1).ToLower();
+                        if (message == "quit")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
+                            System.Environment.Exit(1);
+                        }
+                    }
+                }
+            };
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            _bot = new DiscordClient();
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if(usernameBox.TextLength != 0 && passwordBox.TextLength != 0)
+            {
+                email = usernameBox.Text;
+                password = passwordBox.Text;
+                Running();
+            }
+        }
+    }
+}
