@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using Discord;
 
 namespace DiscordBot
@@ -16,8 +19,76 @@ namespace DiscordBot
         private static string admin = "dreameater"; // admin name here
         private static string message; // store received message here
 
+        Random rand = new Random();
+        Boolean RPS = false;
+        Boolean win = false;
+        Boolean loss = false;
+
+        StreamWriter linksWriter;
+        StreamWriter scoreWriter;
+        StreamReader scoreReader;
+        StreamReader linksReader;
+
+        Dictionary<string, int> scoreboard = new Dictionary<string, int>();
+        ArrayList links = new ArrayList();
+
         public Form1()
         {
+            if (File.Exists("C:\\Scoreboard.txt"))
+            {
+                scoreReader = new StreamReader("C:\\Scoreboard.txt");
+                try
+                {
+                    do
+                    {
+                        string tmp = scoreReader.ReadLine();
+                        string[] words = tmp.Split(' ');
+                        string username = "";
+                        int score = 0;
+                        int count = 0;
+                        while (count != words.Length - 1)
+                        {
+                            username += words[count];
+                            if (count != words.Length - 2)
+                            {
+                                username += " ";
+                            }
+                            count++;
+                        }
+                        scoreboard.Add(username, score);
+                    }
+                    while (scoreReader.Peek() != -1);
+                }
+                catch
+                {
+                    // empty
+                }
+                finally
+                {
+                    scoreReader.Close();
+                }
+            }
+            if (File.Exists("C:\\Links.txt"))
+            {
+                linksReader = new StreamReader("C:\\Links.txt");
+                try
+                {
+                    do
+                    {
+                        string tmp = linksReader.ReadLine();
+                        links.Add(tmp);
+                    }
+                    while (linksReader.Peek() != -1);
+                }
+                catch
+                {
+                    // empty
+                }
+                finally
+                {
+                    linksReader.Close();
+                }
+            }
             InitializeComponent();
         }
 
@@ -48,6 +119,62 @@ namespace DiscordBot
                         } else if (message == "spam")
                         {
                             await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
+                        } else if (message == "rock") {
+                            RPS = true;
+                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
+                            if (num == 0)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! We tie!");
+                            }
+                            else if (num == 1)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! I win! (-1 score)");
+                                loss = true;
+                            }
+                            else
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! You win! (+1 score)");
+                                win = true;
+                            }
+                            await _bot.DeleteMessage(e.Message);
+                        } else if (message == "paper")
+                        {
+                            RPS = true;
+                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
+                            if (num == 0)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! You win! (+1 score)");
+                                win = true;
+                            }
+                            else if (num == 1)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! We tie!");
+                            }
+                            else
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! I win! (-1 score)");
+                                loss = true;
+                            }
+                            await _bot.DeleteMessage(e.Message);
+                        } else if (message == "scissors")
+                        {
+                            RPS = true;
+                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
+                            if (num == 0)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose rock! I win! (-1 score)");
+                                loss = true;
+                            }
+                            else if (num == 1)
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose paper! You win! (+1 score)");
+                                win = true;
+                            }
+                            else
+                            {
+                                await _bot.SendMessage("109469668976140288", "@" + e.Message.User.Name + ": " + "I chose scissors! We tie!");
+                            }
+                            await _bot.DeleteMessage(e.Message);
                         } else if (message == "fkalec")
                         {
                             await _bot.SendMessage(e.ChannelId, "fk alec");
@@ -57,13 +184,67 @@ namespace DiscordBot
                         } else if (message == "dnd")
                         {
                             await _bot.SendMessage(e.ChannelId, "D&D is scheduled for Sunday November 1st, sometime around 1pm.");
-                        } else if (message == "quit")
+                        } else if (message == "quit" && e.Message.User.Name == admin)
                         {
-                            if (e.Message.User.Name == admin)
+                            await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
+                            scoreWriter = new StreamWriter("C:\\Scoreboard.txt");
+                            foreach (KeyValuePair<string, int> pair in scoreboard)
                             {
-                                await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
-                                System.Environment.Exit(1);
+                                scoreWriter.WriteLine(pair.Key + " " + pair.Value);
                             }
+                            scoreWriter.Close();
+
+                            linksWriter = new StreamWriter("C:\\Links.txt");
+                            foreach (string str in links)
+                            {
+                                linksWriter.WriteLine(str);
+                            }
+                            linksWriter.Close();
+                            System.Environment.Exit(1);
+                        } else if (message == "scores")
+                        {
+                            string txtScores = "";
+                            foreach (KeyValuePair<string, int> pair in scoreboard)
+                            {
+                                txtScores += (pair.Key + ": " + pair.Value + "\n");
+                            }
+                            await _bot.SendMessage("109469668976140288", txtScores);
+                        } else if (message == "links")
+                        {
+                            string concat = "";
+                            foreach (string str in links)
+                            {
+                                concat = concat + str + "\n";
+                            }
+                            await _bot.SendMessage(e.ChannelId, concat);
+                        }
+                        if (RPS == true)
+                        {
+                            if (!scoreboard.ContainsKey(e.Message.User.Name))
+                            {
+                                scoreboard.Add(e.Message.User.Name, 0);
+                            }
+                            if (win == true)
+                            {
+                                scoreboard[e.Message.User.Name] += 1;
+                            }
+                            else if (loss == true)
+                            {
+                                scoreboard[e.Message.User.Name] -= 1;
+                                if (scoreboard[e.Message.User.Name] == -1)
+                                {
+                                    scoreboard[e.Message.User.Name] = 0;
+                                }
+                            }
+                            RPS = false;
+                            win = false;
+                            loss = false;
+                        }
+                    } else if (e.Message.Text.StartsWith("http"))
+                    {
+                        if (e.Message.User.Name != "Jack Bot")
+                        {
+                            links.Add(e.Message.Text);
                         }
                     }
                 }
