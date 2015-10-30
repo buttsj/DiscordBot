@@ -43,7 +43,7 @@ namespace DiscordBot
 
                         if (message == "help")
                         {
-                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !meme !dnd !rock/paper/scissors !spam");
+                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !dnd !spam !fkalec");
                         } else if (message == "spam")
                         {
                             await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
