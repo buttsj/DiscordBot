@@ -13,6 +13,7 @@ namespace DiscordBot
         private static string email;
         private static string password;
 
+        private static string admin = "dreameater"; // admin name here
         private static string message; // store received message here
 
         public Form1()
@@ -37,7 +38,7 @@ namespace DiscordBot
                         if (listBox1.InvokeRequired)
                         {
                             listBox1.Invoke(new MethodInvoker(delegate {
-                                listBox1.Items.Add(DateTime.Now.ToLongTimeString() + ":" + " command " + "'!" + message + "'" + " from " + e.Message.UserId);
+                                listBox1.Items.Add(DateTime.Now.ToLongTimeString() + ":" + " command " + "'!" + message + "'" + " from " + e.Message.User.Name);
                             }));
                         }
 
@@ -56,17 +57,13 @@ namespace DiscordBot
                         } else if (message == "dnd")
                         {
                             await _bot.SendMessage(e.ChannelId, "D&D is scheduled for Sunday November 1st, sometime around 1pm.");
-                        }
-                    }
-                } else
-                {
-                    if (e.Message.Text.StartsWith("!"))
-                    {
-                        message = e.Message.Text.Remove(0, 1).ToLower();
-                        if (message == "quit")
+                        } else if (message == "quit")
                         {
-                            await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
-                            System.Environment.Exit(1);
+                            if (e.Message.User.Name == admin)
+                            {
+                                await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
+                                System.Environment.Exit(1);
+                            }
                         }
                     }
                 }
