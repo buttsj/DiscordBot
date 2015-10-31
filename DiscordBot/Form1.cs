@@ -37,58 +37,62 @@ namespace DiscordBot
         {
             if (File.Exists("C:\\Scoreboard.txt"))
             {
-                scoreReader = new StreamReader("C:\\Scoreboard.txt");
-                try
+                using (scoreReader = new StreamReader("C:\\Scoreboard.txt"))
                 {
-                    do
+                    try
                     {
-                        string tmp = scoreReader.ReadLine();
-                        string[] words = tmp.Split(' ');
-                        string username = "";
-                        int score = 0;
-                        int count = 0;
-                        while (count != words.Length - 1)
+                        do
                         {
-                            username += words[count];
-                            if (count != words.Length - 2)
+                            string tmp = scoreReader.ReadLine();
+                            string[] words = tmp.Split(' ');
+                            string username = "";
+                            int score = 0;
+                            int count = 0;
+                            while (count != words.Length - 1)
                             {
-                                username += " ";
+                                username += words[count];
+                                if (count != words.Length - 2)
+                                {
+                                    username += " ";
+                                }
+                                count++;
                             }
-                            count++;
+                            score = Int32.Parse(words[count]);
+                            scoreboard.Add(username, score);
                         }
-                        score = Int32.Parse(words[count]);
-                        scoreboard.Add(username, score);
+                        while (scoreReader.Peek() != -1);
                     }
-                    while (scoreReader.Peek() != -1);
-                }
-                catch
-                {
-                    // empty
-                }
-                finally
-                {
-                    scoreReader.Close();
+                    catch
+                    {
+                        // empty
+                    }
+                    finally
+                    {
+                        scoreReader.Close();
+                    }
                 }
             }
             if (File.Exists("C:\\Links.txt"))
             {
-                linksReader = new StreamReader("C:\\Links.txt");
-                try
+                using (linksReader = new StreamReader("C:\\Links.txt"))
                 {
-                    do
+                    try
                     {
-                        string tmp = linksReader.ReadLine();
-                        links.Add(tmp);
+                        do
+                        {
+                            string tmp = linksReader.ReadLine();
+                            links.Add(tmp);
+                        }
+                        while (linksReader.Peek() != -1);
                     }
-                    while (linksReader.Peek() != -1);
-                }
-                catch
-                {
-                    // empty
-                }
-                finally
-                {
-                    linksReader.Close();
+                    catch
+                    {
+                        // empty
+                    }
+                    finally
+                    {
+                        linksReader.Close();
+                    }
                 }
             }
             InitializeComponent();
@@ -312,7 +316,7 @@ namespace DiscordBot
             {
                 VisitLink();
             }
-            catch (Exception ex)
+            catch
             {
                 // link didn't work
             }
