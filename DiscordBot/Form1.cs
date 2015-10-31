@@ -56,6 +56,7 @@ namespace DiscordBot
                             }
                             count++;
                         }
+                        score = Int32.Parse(words[count]);
                         scoreboard.Add(username, score);
                     }
                     while (scoreReader.Peek() != -1);
@@ -95,7 +96,7 @@ namespace DiscordBot
 
         private void Running()
         {
-            _bot.Connect(email, password).Wait(); // connect to server
+            
             enterCred.Text = "Connected!";
             message = "";
 
@@ -116,7 +117,7 @@ namespace DiscordBot
 
                         if (message == "help")
                         {
-                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !dnd !spam !fkalec");
+                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !dnd !spam !fkalec !rock/paper/scissors !scores");
                         } else if (message == "spam")
                         {
                             await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
@@ -293,7 +294,15 @@ namespace DiscordBot
             {
                 email = usernameBox.Text;
                 password = passwordBox.Text;
-                Running();
+                try
+                {
+                    _bot.Connect(email, password).Wait(); // connect to server
+                    Running();
+                }
+                catch
+                {
+                    listBox1.Items.Add("Invalid Username/Password");
+                }
             }
         }
 
