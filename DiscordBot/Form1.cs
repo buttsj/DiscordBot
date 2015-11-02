@@ -263,15 +263,13 @@ namespace DiscordBot
                             {
                                 duo.Add(e.Message.User.Name);
                                 await _bot.SendMessage(e.ChannelId, "Added " + e.Message.User.Name + " to the duo list!\n");
-                            } else
-                            {
-                                string duoList = "Duo list: \n";
-                                foreach (string d in duo)
-                                {
-                                    duoList += d + "\n";
-                                }
-                                await _bot.SendMessage(e.ChannelId, duoList);
                             }
+                            string duoList = "Duo list: \n";
+                            foreach (string d in duo)
+                            {
+                                duoList += d + "\n";
+                            }
+                            await _bot.SendMessage(e.ChannelId, duoList);
                         } else if (message == "noduo")
                         {
                             if (duo.Contains(e.Message.User.Name))
@@ -301,6 +299,7 @@ namespace DiscordBot
                                     scoreboard[e.Message.User.Name] = 0;
                                 }
                             }
+                            await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "Your score is now " + scoreboard[e.Message.User.Name] + "\n");
                             RPS = false;
                             win = false;
                             loss = false;
