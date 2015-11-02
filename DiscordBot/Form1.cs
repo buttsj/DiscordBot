@@ -15,23 +15,28 @@ namespace DiscordBot
         /**DETAILS FOR LOGIN**/
         private static string email;
         private static string password;
-
         private static string admin = "dreameater"; // admin name here
         private static string message; // store received message here
         private static string botChannel = "109469668976140288"; // channel to send most bot messages to
 
+        // Rock/paper/scissors tools
         Random rand = new Random();
         Boolean RPS = false;
         Boolean win = false;
         Boolean loss = false;
 
+
+        // Reading/Writing tools
         StreamWriter linksWriter;
         StreamWriter scoreWriter;
         StreamReader scoreReader;
         StreamReader linksReader;
 
+        // Scoreboard tools
         Dictionary<string, int> scoreboard = new Dictionary<string, int>();
         ArrayList links = new ArrayList();
+
+        ArrayList duo = new ArrayList();
 
         public Form1()
         {
@@ -252,6 +257,31 @@ namespace DiscordBot
                                 concat = concat + str + "\n";
                             }
                             await _bot.SendMessage(e.ChannelId, concat);
+                        } else if (message == "duo")
+                        {
+                            if (!duo.Contains(e.Message.User.Name))
+                            {
+                                duo.Add(e.Message.User.Name);
+                                await _bot.SendMessage(e.ChannelId, "Added " + e.Message.User.Name + " to the duo list!\n");
+                            } else
+                            {
+                                string duoList = "Duo list: \n";
+                                foreach (string d in duo)
+                                {
+                                    duoList += d + "\n";
+                                }
+                                await _bot.SendMessage(e.ChannelId, duoList);
+                            }
+                        } else if (message == "noduo")
+                        {
+                            if (duo.Contains(e.Message.User.Name))
+                            {
+                                duo.Remove(e.Message.User.Name);
+                                await _bot.SendMessage(e.ChannelId, "Removed " + e.Message.User.Name + " from the duo list\n");
+                            }
+                        } else if (message == "<3")
+                        {
+                            await _bot.SendMessage(e.ChannelId, "<3");
                         }
                         if (RPS == true)
                         {
