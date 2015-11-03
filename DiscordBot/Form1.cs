@@ -18,6 +18,7 @@ namespace DiscordBot
         private static string admin = "dreameater"; // admin name here
         private static string message; // store received message here
         private static string botChannel = "109469668976140288"; // channel to send most bot messages to
+        private static string currentChannel;
 
         // Rock/paper/scissors tools
         Random rand = new Random();
@@ -116,6 +117,7 @@ namespace DiscordBot
                 {
                     if (e.Message.Text.StartsWith("!"))
                     {
+                        currentChannel = e.ChannelId;
                         message = e.Message.Text.Remove(0, 1).ToLower();
                         if (listBox1.InvokeRequired)
                         {
@@ -123,188 +125,57 @@ namespace DiscordBot
                                 listBox1.Items.Add(DateTime.Now.ToLongTimeString() + ":" + " command " + "'!" + message + "'" + " from " + e.Message.User.Name);
                             }));
                         }
-
-                        if (message == "help")
+                        switch (message)
                         {
-                            await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !dnd !spam !fkalec !rock/paper/scissors !scores");
-                        } else if (message == "spam")
-                        {
-                            await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
-                        } else if (message == "rock") {
-                            RPS = true;
-                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
-                            if (num == 0)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! We tie!");
-                            }
-                            else if (num == 1)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! I win! (-1 score)");
-                                loss = true;
-                            }
-                            else
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! You win! (+1 score)");
-                                win = true;
-                            }
-                            try
-                            {
-                                await _bot.DeleteMessage(e.Message);
-                            }
-                            catch
-                            {
-                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
-                            }
-                        } else if (message == "paper")
-                        {
-                            RPS = true;
-                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
-                            if (num == 0)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! You win! (+1 score)");
-                                win = true;
-                            }
-                            else if (num == 1)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! We tie!");
-                            }
-                            else
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! I win! (-1 score)");
-                                loss = true;
-                            }
-                            try
-                            {
-                                await _bot.DeleteMessage(e.Message);
-                            }
-                            catch
-                            {
-                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
-                            }
-                        } else if (message == "scissors")
-                        {
-                            RPS = true;
-                            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
-                            if (num == 0)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock! I win! (-1 score)");
-                                loss = true;
-                            }
-                            else if (num == 1)
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper! You win! (+1 score)");
-                                win = true;
-                            }
-                            else
-                            {
-                                await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors! We tie!");
-                            }
-                            try
-                            {
-                                await _bot.DeleteMessage(e.Message);
-                            }
-                            catch
-                            {
-                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
-                            }
-                        } else if (message == "fkalec")
-                        {
-                            await _bot.SendMessage(e.ChannelId, "fk alec");
-                        } else if (message == "jackbot")
-                        {
-                            await _bot.SendMessage(e.ChannelId, "Hello my good friend. Hope you have a jooday.");
-                        } else if (message == "dnd")
-                        {
-                            await _bot.SendMessage(e.ChannelId, "D&D is scheduled for Sunday November 1st, sometime around 1pm.");
-                        } else if (message == "quit" && e.Message.User.Name == admin)
-                        {
-                            await _bot.SendMessage(e.ChannelId, "*beep boop* Shutting down...");
-                            scoreWriter = new StreamWriter("C:\\Scoreboard.txt");
-                            foreach (KeyValuePair<string, int> pair in scoreboard)
-                            {
-                                scoreWriter.WriteLine(pair.Key + " " + pair.Value);
-                            }
-                            scoreWriter.Close();
-
-                            linksWriter = new StreamWriter("C:\\Links.txt");
-                            foreach (string str in links)
-                            {
-                                linksWriter.WriteLine(str);
-                            }
-                            linksWriter.Close();
-                            System.Environment.Exit(1);
-                        } else if (message == "scores")
-                        {
-                            string txtScores = "";
-                            foreach (KeyValuePair<string, int> pair in scoreboard)
-                            {
-                                txtScores += (pair.Key + ": " + pair.Value + "\n");
-                            }
-                            try
-                            {
-                                await _bot.DeleteMessage(e.Message);
-                            }
-                            catch
-                            {
-                                await _bot.SendMessage(e.ChannelId, "Your command cannot be deleted in this channel.\n");
-                            }
-                            await _bot.SendMessage(botChannel, txtScores);
-                        } else if (message == "links")
-                        {
-                            string concat = "";
-                            foreach (string str in links)
-                            {
-                                concat = concat + str + "\n";
-                            }
-                            await _bot.SendMessage(e.ChannelId, concat);
-                        } else if (message == "duo")
-                        {
-                            if (!duo.Contains(e.Message.User.Name))
-                            {
-                                duo.Add(e.Message.User.Name);
-                                await _bot.SendMessage(e.ChannelId, "Added " + e.Message.User.Name + " to the duo list!\n");
-                            }
-                            string duoList = "Duo list: \n";
-                            foreach (string d in duo)
-                            {
-                                duoList += d + "\n";
-                            }
-                            await _bot.SendMessage(e.ChannelId, duoList);
-                        } else if (message == "noduo")
-                        {
-                            if (duo.Contains(e.Message.User.Name))
-                            {
-                                duo.Remove(e.Message.User.Name);
-                                await _bot.SendMessage(e.ChannelId, "Removed " + e.Message.User.Name + " from the duo list\n");
-                            }
-                        } else if (message == "<3")
-                        {
-                            await _bot.SendMessage(e.ChannelId, "<3");
-                        }
-                        if (RPS == true)
-                        {
-                            if (!scoreboard.ContainsKey(e.Message.User.Name))
-                            {
-                                scoreboard.Add(e.Message.User.Name, 0);
-                            }
-                            if (win == true)
-                            {
-                                scoreboard[e.Message.User.Name] += 1;
-                            }
-                            else if (loss == true)
-                            {
-                                scoreboard[e.Message.User.Name] -= 1;
-                                if (scoreboard[e.Message.User.Name] == -1)
+                            case "help":
+                                await _bot.SendMessage(e.ChannelId, "Commands include !jackbot !dnd !spam !fkalec !rock/paper/scissors !scores");
+                                break;
+                            case "spam":
+                                await _bot.SendMessage(e.ChannelId, "Sorry for someone spamming me :( I promise it's not my fault...");
+                                break;
+                            case "rock":
+                                RockPaperScissors(e, 0);
+                                break;
+                            case "paper":
+                                RockPaperScissors(e, 1);
+                                break;
+                            case "scissors":
+                                RockPaperScissors(e, 2);
+                                break;
+                            case "fkalec":
+                                await _bot.SendMessage(e.ChannelId, "fk alec");
+                                break;
+                            case "jackbot":
+                                await _bot.SendMessage(e.ChannelId, "Hello my good friend. Hope you have a jooday.");
+                                break;
+                            case "dnd":
+                                await _bot.SendMessage(e.ChannelId, "D&D is scheduled for Sunday November 1st, sometime around 1pm.");
+                                break;
+                            case "quit":
+                                Quit(e);
+                                break;
+                            case "scores":
+                                Scores(e);
+                                break;
+                            case "links":
+                                Links(e);
+                                break;
+                            case "duo":
+                                Duo(e);
+                                break;
+                            case "noduo":
+                                if (duo.Contains(e.Message.User.Name))
                                 {
-                                    scoreboard[e.Message.User.Name] = 0;
+                                    duo.Remove(e.Message.User.Name);
+                                    await _bot.SendMessage(e.ChannelId, "Removed " + e.Message.User.Name + " from the duo list\n");
                                 }
-                            }
-                            await _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "Your score is now " + scoreboard[e.Message.User.Name] + "\n");
-                            RPS = false;
-                            win = false;
-                            loss = false;
+                                break;
+                            case "<3":
+                                await _bot.SendMessage(e.ChannelId, "<3");
+                                break;
                         }
-                    } else if (e.Message.Text.StartsWith("http"))
+                    }
+                    else if (e.Message.Text.StartsWith("http"))
                     {
                         if (e.Message.User.Name != "Jack Bot")
                         {
@@ -313,6 +184,142 @@ namespace DiscordBot
                     }
                 }
             };
+        }
+
+        private void RockPaperScissors(MessageEventArgs e, int playerChoice)
+        {
+            if (!scoreboard.ContainsKey(e.Message.User.Name))
+            {
+                scoreboard.Add(e.Message.User.Name, 0);
+            }
+
+            int num = rand.Next(0, 3); // 0 = rock; 1 = paper; 2 = scissors
+            if (num == 0 && playerChoice == 0)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock and you chose rock. We tie!");
+            }
+            else if (num == 0 && playerChoice == 1)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock and you chose paper. You win!");
+                IncreaseScore(e);
+            }
+            else if (num == 0 && playerChoice == 2)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose rock and you chose scissors. I win!");
+                DeductScore(e);
+            }
+            else if (num == 1 && playerChoice == 0)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper and you chose rock. I win!");
+                DeductScore(e);
+            }
+            else if (num == 1 && playerChoice == 1)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper and you chose paper. We tie!");
+            }
+            else if (num == 1 && playerChoice == 2)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose paper and you chose scissors. You win!");
+                IncreaseScore(e);
+            }
+            else if (num == 2 && playerChoice == 0)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors and you chose rock. You win!");
+                IncreaseScore(e);
+            }
+            else if (num == 2 && playerChoice == 1)
+            {
+                _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors and you chose paper. I win!");
+                DeductScore(e);
+            }
+            else
+            {
+               _bot.SendMessage(botChannel, "@" + e.Message.User.Name + ": " + "I chose scissors and you chose scissors. We tie!");
+            }
+            try
+            {
+                _bot.DeleteMessage(e.Message);
+            }
+            catch
+            {
+                _bot.SendMessage(currentChannel, "Your command cannot be deleted in this channel.\n");
+            }
+
+        }
+
+        private void DeductScore(MessageEventArgs e)
+        {
+            scoreboard[e.Message.User.Name] -= 1;
+        }
+
+        private void IncreaseScore(MessageEventArgs e)
+        {
+            scoreboard[e.Message.User.Name] += 1;
+        }
+
+        private void Quit(MessageEventArgs e)
+        {
+            if (e.Message.User.Name == admin)
+            {
+                _bot.SendMessage(currentChannel, "*beep boop* Shutting down...");
+                scoreWriter = new StreamWriter("C:\\Scoreboard.txt");
+                foreach (KeyValuePair<string, int> pair in scoreboard)
+                {
+                    scoreWriter.WriteLine(pair.Key + " " + pair.Value);
+                }
+                scoreWriter.Close();
+
+                linksWriter = new StreamWriter("C:\\Links.txt");
+                foreach (string str in links)
+                {
+                    linksWriter.WriteLine(str);
+                }
+                linksWriter.Close();
+                System.Environment.Exit(1);
+            }
+        }
+
+        private void Links(MessageEventArgs e)
+        {
+            string concat = "";
+            foreach (string str in links)
+            {
+                concat = concat + str + "\n";
+            }
+            _bot.SendMessage(currentChannel, concat);
+        }
+
+        private void Scores(MessageEventArgs e)
+        {
+            string txtScores = "";
+            foreach (KeyValuePair<string, int> pair in scoreboard)
+            {
+                txtScores += (pair.Key + ": " + pair.Value + "\n");
+            }
+            try
+            {
+                _bot.DeleteMessage(e.Message);
+            }
+            catch
+            {
+                _bot.SendMessage(currentChannel, "Your command cannot be deleted in this channel.\n");
+            }
+            _bot.SendMessage(botChannel, txtScores);
+        }
+
+        private void Duo(MessageEventArgs e)
+        {
+            if (!duo.Contains(e.Message.User.Name))
+            {
+                duo.Add(e.Message.User.Name);
+                _bot.SendMessage(currentChannel, "Added " + e.Message.User.Name + " to the duo list!\n");
+            }
+            string duoList = "Duo list: \n";
+            foreach (string d in duo)
+            {
+                duoList += d + "\n";
+            }
+            _bot.SendMessage(currentChannel, duoList);
         }
 
         private void Form1_Load(object sender, EventArgs e)
