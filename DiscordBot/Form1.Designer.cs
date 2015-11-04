@@ -87,7 +87,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GrayText;
-            this.ClientSize = new System.Drawing.Size(433, 178);
+            this.ClientSize = new System.Drawing.Size(429, 178);
             this.Controls.Add(this.github);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.passwordBox);
