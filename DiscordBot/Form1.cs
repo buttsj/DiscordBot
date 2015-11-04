@@ -101,11 +101,7 @@ namespace DiscordBot
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            DiscordClientConfig dc = new DiscordClientConfig();
-            dc.EnableVoice = true;
-
-            _bot = new DiscordClient(dc);
-            
+            _bot = new DiscordClient();
         }
 
         private void Running()
